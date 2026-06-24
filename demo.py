@@ -2,9 +2,17 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 
-# 修复matplotlib中文方框乱码，必须放在绘图前
-plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'WenQuanYi Micro Hei', 'Heiti TC']
+# ========== 修复云端Linux中文乱码核心配置（优先级调整） ==========
+# 优先使用Streamlit云端预装的文泉驿微米黑，本地Windows兼容兜底
+plt.rcParams['font.sans-serif'] = [
+    'WenQuanYi Micro Hei',
+    'SimHei',
+    'Microsoft YaHei',
+    'Heiti TC',
+    'DejaVu Sans'
+]
 plt.rcParams['axes.unicode_minus'] = False
+plt.rcParams['font.family'] = 'sans-serif'
 
 # ===================== 常量与工具函数（代码规范化） =====================
 FIG_WIDTH = 11
@@ -108,6 +116,9 @@ if use_drag:
     ax.arrow(x_t, y_t, vx_t/2, 0, width=0.15, color=COLOR_VX, label="水平分速度 vₓ")
     ax.arrow(x_t, y_t, 0, -vy_t/2, width=0.15, color=COLOR_VY, label="竖直分速度 vᵧ")
     ax.arrow(x_t, y_t, vx_t/2, -vy_t/2, width=0.15, color=COLOR_VSUM, label="合速度 v")
+    
+    # 强制刷新画布字体缓存，解决云端中文不渲染
+    fig.canvas.draw()
     st.pyplot(fig)
     
     # 实时瞬时数据
@@ -123,6 +134,8 @@ if use_drag:
         st.metric("合速度大小", f"{v_t:.2f} m/s")
         st.metric("速度俯角 θ", f"{theta_t:.1f} °")
 else:
+    # 无滑块时同样刷新画布
+    fig.canvas.draw()
     st.pyplot(fig)
 
 # ===================== 落地总结果面板 =====================
